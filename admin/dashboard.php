@@ -124,19 +124,19 @@ $userRole = $_SESSION['role'] ?? 'admin';
             </div>
 
             <div class="grid">
-                <div class="mini">
-                    <span>Rol</span>
-                    <strong><?= htmlspecialchars($userRole) ?></strong>
-                </div>
-                <div class="mini">
-                    <span>Módulo siguiente</span>
-                    <strong>CRUD de planes</strong>
-                </div>
-                <div class="mini">
-                    <span>Estado</span>
-                    <strong>Sistema activo</strong>
-                </div>
-            </div>
+    <div class="mini">
+        <span>Rol</span>
+        <strong><?= htmlspecialchars($userRole) ?></strong>
+    </div>
+    <div class="mini">
+        <span>Módulo</span>
+        <strong><a href="/admin/plans/index.php" style="color: white;">Gestión de planes</a></strong>
+    </div>
+    <div class="mini">
+        <span>Estado</span>
+        <strong>Sistema activo</strong>
+    </div>
+</div>
         </section>
     </div>
 </body>
