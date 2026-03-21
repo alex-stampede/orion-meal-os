@@ -1,0 +1,25 @@
+:root {
+  /* BRAND */
+  --color-primary: #00382E;
+  --color-secondary: #0f6b57;
+
+  /* UI */
+  --bg-main: #061510;
+  --bg-card: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.1);
+
+  /* TEXT */
+  --text-main: #edf4f1;
+  --text-muted: #a5b7b0;
+
+  /* STATES */
+  --success: #1f9d68;
+  --danger: #c84b4b;
+
+  /* SHADOW */
+  --shadow: 0 20px 60px rgba(0,0,0,.35);
+
+  /* RADIUS */
+  --radius-lg: 24px;
+  --radius-md: 14px;
+}

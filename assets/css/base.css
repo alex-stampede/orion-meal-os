@@ -1,0 +1,5 @@
+body {
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-family: Inter, Arial, sans-serif;
+}
