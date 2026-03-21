@@ -69,96 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Orion Meal OS</title>
-    <style>
-        :root {
-            --bg: #061510;
-            --card: rgba(255,255,255,0.06);
-            --stroke: rgba(255,255,255,0.1);
-            --text: #edf4f1;
-            --muted: #a5b7b0;
-            --accent: #0f6b57;
-            --danger: #c84b4b;
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: grid;
-            place-items: center;
-            padding: 24px;
-            font-family: Inter, Arial, sans-serif;
-            background:
-                radial-gradient(circle at top left, rgba(15, 107, 87, 0.25), transparent 30%),
-                linear-gradient(180deg, #04110d 0%, #081a15 100%);
-            color: var(--text);
-        }
-        .card {
-            width: 100%;
-            max-width: 420px;
-            background: var(--card);
-            border: 1px solid var(--stroke);
-            border-radius: 24px;
-            padding: 28px;
-            backdrop-filter: blur(14px);
-            box-shadow: 0 20px 60px rgba(0,0,0,.35);
-        }
-        .badge {
-            display: inline-block;
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: rgba(15, 107, 87, 0.18);
-            border: 1px solid rgba(125,255,207,.12);
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-        h1 {
-            margin: 0 0 10px;
-            font-size: 2rem;
-        }
-        p {
-            margin: 0 0 20px;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-        label {
-            display: block;
-            margin: 0 0 8px;
-            font-size: .95rem;
-        }
-        input {
-            width: 100%;
-            padding: 14px 16px;
-            margin-bottom: 16px;
-            border-radius: 14px;
-            border: 1px solid var(--stroke);
-            background: rgba(255,255,255,0.04);
-            color: var(--text);
-            outline: none;
-        }
-        input::placeholder {
-            color: #90a29b;
-        }
-        button {
-            width: 100%;
-            padding: 14px 16px;
-            border: 0;
-            border-radius: 14px;
-            background: var(--accent);
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .error {
-            margin-bottom: 16px;
-            padding: 12px 14px;
-            border-radius: 12px;
-            background: rgba(200,75,75,0.12);
-            border: 1px solid rgba(200,75,75,0.3);
-            color: #ffd7d7;
-        }
-    </style>
+
+        <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/base.css">
+<link rel="stylesheet" href="/assets/css/components.css">
+
 </head>
 <body>
     <form class="card" method="POST" action="/login.php">
