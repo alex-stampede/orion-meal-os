@@ -2,22 +2,12 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../config/bootstrap.php';
+require __DIR__ . '/partials/auth.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header('Location: /login.php');
-    exit;
-}
-
-if (($_SESSION['role'] ?? '') !== 'customer') {
-    header('Location: /admin/dashboard.php');
-    exit;
-}
-
-$userId = (int)$_SESSION['user_id'];
+$pageTitle = 'Mi cuenta';
 
 $stmt = $pdo->prepare("
-    SELECT s.*, mp.name
+    SELECT s.*, mp.name, mp.meals_per_week, mp.duration_weeks
     FROM subscriptions s
     JOIN meal_plans mp ON mp.id = s.meal_plan_id
     WHERE s.user_id = ? AND s.status = 'active'
@@ -26,58 +16,54 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$userId]);
 $sub = $stmt->fetch();
+
+require __DIR__ . '/partials/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi cuenta | Orion Meal OS</title>
-    <link rel="stylesheet" href="/assets/css/theme.css">
-    <link rel="stylesheet" href="/assets/css/base.css">
-    <link rel="stylesheet" href="/assets/css/components.css">
-    <link rel="stylesheet" href="/assets/css/app.css">
-</head>
-<body>
-    <main class="shell">
-        <section class="card page-card">
-            <div class="page-top">
-                <div>
-                    <div class="badge">Cliente</div>
-                    <h1>Mi cuenta</h1>
-                    <p>Bienvenido, <?= htmlspecialchars($_SESSION['user_name'] ?? 'Cliente') ?></p>
-                </div>
-                <a class="button-secondary" href="/logout.php">Cerrar sesión</a>
+
+<section class="card page-card">
+    <div class="customer-topbar">
+        <div>
+            <div class="badge">Cliente</div>
+            <h1>Hola, <?= htmlspecialchars($userName) ?></h1>
+            <p class="helper-text">Aquí puedes revisar tu plan y seleccionar tus comidas.</p>
+
+            <div class="customer-nav">
+                <a class="button-secondary" href="/app/dashboard.php">Mi cuenta</a>
+                <a class="button-secondary" href="/app/plans.php">Planes</a>
+                <a class="button-secondary" href="/app/select-meals.php">Seleccionar comidas</a>
             </div>
+        </div>
 
-            <?php if ($sub): ?>
-                <div class="grid">
-                    <div class="mini-card">
-                        <span class="label">Plan activo</span>
-                        <strong><?= htmlspecialchars($sub['name']) ?></strong>
-                    </div>
-                    <div class="mini-card">
-                        <span class="label">Inicio</span>
-                        <strong><?= htmlspecialchars($sub['start_date']) ?></strong>
-                    </div>
-                    <div class="mini-card">
-                        <span class="label">Fin</span>
-                        <strong><?= htmlspecialchars($sub['end_date']) ?></strong>
-                    </div>
-                </div>
+        <a class="button-secondary" href="/logout.php">Cerrar sesión</a>
+    </div>
 
-                <div class="actions-row" style="margin-top: 24px;">
-                    <a class="button" href="/app/select-meals.php">Seleccionar comidas</a>
-                    <a class="button-secondary" href="/app/plans.php">Ver planes</a>
-                </div>
-            <?php else: ?>
-                <div class="message-error">No tienes un plan activo todavía.</div>
+    <?php if ($sub): ?>
+        <div class="customer-grid">
+            <div class="mini-card">
+                <span class="label">Plan activo</span>
+                <strong><?= htmlspecialchars($sub['name']) ?></strong>
+            </div>
+            <div class="mini-card">
+                <span class="label">Comidas por semana</span>
+                <strong><?= (int)$sub['meals_per_week'] ?></strong>
+            </div>
+            <div class="mini-card">
+                <span class="label">Vigencia</span>
+                <strong><?= htmlspecialchars($sub['start_date']) ?> a <?= htmlspecialchars($sub['end_date']) ?></strong>
+            </div>
+        </div>
 
-                <div class="actions-row">
-                    <a class="button" href="/app/plans.php">Elegir plan</a>
-                </div>
-            <?php endif; ?>
-        </section>
-    </main>
-</body>
-</html>
+        <div class="actions-row" style="margin-top:24px;">
+            <a class="button" href="/app/select-meals.php">Seleccionar comidas</a>
+        </div>
+    <?php else: ?>
+        <div class="empty-state">
+            <p>No tienes un plan activo todavía.</p>
+            <div class="actions-row">
+                <a class="button" href="/app/plans.php">Elegir plan</a>
+            </div>
+        </div>
+    <?php endif; ?>
+</section>
+
+<?php require __DIR__ . '/partials/footer.php'; ?>

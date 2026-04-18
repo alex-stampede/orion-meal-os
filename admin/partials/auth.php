@@ -9,5 +9,10 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+if (!in_array($_SESSION['role'] ?? '', ['super_admin', 'admin'], true)) {
+    header('Location: /app/dashboard.php');
+    exit;
+}
+
 $userName = $_SESSION['user_name'] ?? 'Usuario';
 $userRole = $_SESSION['role'] ?? 'admin';
