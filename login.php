@@ -2,32 +2,14 @@
 
 declare(strict_types=1);
 
-session_start();
+require __DIR__ . '/config/bootstrap.php';
 
-$dbConfig = require __DIR__ . '/config/database.php';
+if (isset($_SESSION['user_id'], $_SESSION['role'])) {
+    if ($_SESSION['role'] === 'customer') {
+        header('Location: /app/dashboard.php');
+        exit;
+    }
 
-function db(array $dbConfig): PDO
-{
-    $dsn = sprintf(
-        'mysql:host=%s;dbname=%s;charset=%s',
-        $dbConfig['host'],
-        $dbConfig['name'],
-        $dbConfig['charset']
-    );
-
-    return new PDO(
-        $dsn,
-        $dbConfig['user'],
-        $dbConfig['pass'],
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-        ]
-    );
-}
-
-if (isset($_SESSION['user_id'])) {
     header('Location: /admin/dashboard.php');
     exit;
 }
@@ -39,11 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     try {
-        $pdo = db($dbConfig);
-
         $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND status = 'active' LIMIT 1");
         $stmt->execute([$email]);
-
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password_hash'])) {
@@ -53,11 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['role'] = $user['role'];
             $_SESSION['user_name'] = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
 
+            if ($user['role'] === 'customer') {
+                header('Location: /app/dashboard.php');
+                exit;
+            }
+
             header('Location: /admin/dashboard.php');
             exit;
         }
 
-        $error = 'Credenciales incorrectas';
+        $error = 'Credenciales incorrectas.';
     } catch (Throwable $e) {
         $error = 'Ocurrió un error al iniciar sesión.';
     }
@@ -68,30 +52,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Orion Meal OS</title>
-
-        <link rel="stylesheet" href="/assets/css/theme.css">
-<link rel="stylesheet" href="/assets/css/base.css">
-<link rel="stylesheet" href="/assets/css/components.css">
-
+    <title>Iniciar sesión | Orion Meal OS</title>
+    <link rel="stylesheet" href="/assets/css/theme.css">
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
 </head>
 <body>
-    <form class="card" method="POST" action="/login.php">
-        <div class="badge">Admin Access</div>
-        <h1>Iniciar sesión</h1>
-        <p>Accede al panel interno de Orion Meal OS.</p>
+    <main class="shell">
+        <section class="card page-card" style="max-width: 640px; margin: 40px auto;">
+            <div class="page-top">
+                <div>
+                    <div class="badge">Acceso</div>
+                    <h1>Iniciar sesión</h1>
+                    <p>Accede a tu cuenta para administrar o seleccionar tus comidas.</p>
+                </div>
+            </div>
 
-        <?php if ($error !== ''): ?>
-            <div class="error"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
+            <?php if ($error !== ''): ?>
+                <div class="message-error"><?= htmlspecialchars($error) ?></div>
+            <?php endif; ?>
 
-        <label for="email">Correo</label>
-        <input id="email" type="email" name="email" placeholder="admin@app.minvitaciondigital.com.mx" required>
+            <form method="POST" class="form-grid">
+                <div class="form-group full">
+                    <label>Correo</label>
+                    <input class="input" type="email" name="email" required>
+                </div>
 
-        <label for="password">Contraseña</label>
-        <input id="password" type="password" name="password" placeholder="••••••••" required>
+                <div class="form-group full">
+                    <label>Contraseña</label>
+                    <input class="input" type="password" name="password" required>
+                </div>
 
-        <button type="submit">Entrar</button>
-    </form>
+                <div class="actions-row">
+                    <button class="button" type="submit">Entrar</button>
+                    <a class="button-secondary" href="/app/register.php">Crear cuenta</a>
+                </div>
+            </form>
+        </section>
+    </main>
 </body>
 </html>
