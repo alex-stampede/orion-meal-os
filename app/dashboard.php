@@ -84,6 +84,7 @@ require __DIR__ . '/partials/header.php';
 
 <section class="card page-card">
 
+<!-- TOP -->
 <div class="customer-topbar">
     <div>
         <div class="badge">Cliente</div>
@@ -142,8 +143,8 @@ require __DIR__ . '/partials/header.php';
 <?php if ($menu): ?>
 <strong><?= $menu['title'] ?></strong>
 
-<?php if ($menu['selection_deadline']): ?>
-<p>
+<?php if (!empty($menu['selection_deadline'])): ?>
+<p class="helper-text">
 Selecciona antes de:
 <strong><?= date('d/m h:i A', strtotime($menu['selection_deadline'])) ?></strong>
 </p>
@@ -158,17 +159,21 @@ Selecciona antes de:
 </div>
 </section>
 
-<!-- RESUMEN -->
-<section style="margin-top:30px;">
+<!-- 🔥 RESUMEN CORREGIDO -->
+<section class="week-section">
 <h2>Tu semana</h2>
 
-<?php foreach ($days as $d): ?>
-<div class="card" style="margin-top:12px;">
+<div class="week-wrapper">
 
-<h3><?= $labels[$d] ?></h3>
+<?php foreach ($days as $d): ?>
+<div class="day-card">
+
+<h3 class="day-title"><?= $labels[$d] ?></h3>
 
 <?php if (!$summary[$d]['items']): ?>
-<p>No seleccionaste platillos</p>
+
+<p class="helper-text">No seleccionaste platillos</p>
+
 <?php else: ?>
 
 <ul>
@@ -189,12 +194,15 @@ Selecciona antes de:
 </div>
 <?php endforeach; ?>
 
+</div>
 </section>
 
 <?php else: ?>
 
+<div class="empty-state">
 <p>No tienes plan activo</p>
 <a class="button" href="/app/plans.php">Elegir plan</a>
+</div>
 
 <?php endif; ?>
 
