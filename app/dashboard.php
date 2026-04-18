@@ -40,26 +40,21 @@ $menuStmt = $pdo->query("
 $menu = $menuStmt->fetch();
 
 /* ===== RESUMEN POR DÍA ===== */
-$days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+$days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
 $labels = [
-    'monday' => 'Lunes',
-    'tuesday' => 'Martes',
-    'wednesday' => 'Miércoles',
-    'thursday' => 'Jueves',
-    'friday' => 'Viernes',
-    'saturday' => 'Sábado',
-    'sunday' => 'Domingo',
+    'monday'=>'Lunes','tuesday'=>'Martes','wednesday'=>'Miércoles',
+    'thursday'=>'Jueves','friday'=>'Viernes','saturday'=>'Sábado','sunday'=>'Domingo'
 ];
 
 $summary = [];
 
 foreach ($days as $d) {
     $summary[$d] = [
-        'items' => [],
-        'calories' => 0,
-        'protein' => 0,
-        'carbs' => 0,
-        'fats' => 0,
+        'items'=>[],
+        'calories'=>0,
+        'protein'=>0,
+        'carbs'=>0,
+        'fats'=>0
     ];
 }
 
@@ -69,18 +64,14 @@ if ($sub) {
         FROM meal_selections ms
         JOIN menu_items mi ON mi.id = ms.menu_item_id
         WHERE ms.subscription_id = ?
-        ORDER BY FIELD(mi.day_of_week, 'monday','tuesday','wednesday','thursday','friday','saturday','sunday'), mi.category, mi.id
     ");
     $sel->execute([$sub['id']]);
 
     foreach ($sel->fetchAll() as $item) {
         $d = $item['day_of_week'];
 
-        if (!isset($summary[$d])) {
-            continue;
-        }
-
         $summary[$d]['items'][] = $item;
+
         $summary[$d]['calories'] += (int)($item['calories'] ?? 0);
         $summary[$d]['protein'] += (float)($item['protein_g'] ?? 0);
         $summary[$d]['carbs'] += (float)($item['carbs_g'] ?? 0);
@@ -93,123 +84,127 @@ require __DIR__ . '/partials/header.php';
 
 <section class="card page-card">
 
-    <div class="customer-topbar">
-        <div>
-            <div class="badge">Cliente</div>
-            <h1>Hola, <?= htmlspecialchars($userName) ?></h1>
+<!-- TOP -->
+<div class="customer-topbar">
+    <div>
+        <div class="badge">Cliente</div>
+        <h1>Hola, <?= htmlspecialchars($userName) ?></h1>
 
-            <div class="customer-nav">
-                <a class="button-secondary" href="/app/dashboard.php">Mi cuenta</a>
-                <a class="button-secondary" href="/app/plans.php">Planes</a>
-                <a class="button-secondary" href="/app/select-meals.php">Seleccionar comidas</a>
-                <a class="button-secondary" href="/app/address.php">Mi dirección</a>
-            </div>
+        <div class="customer-nav">
+            <a class="button-secondary" href="/app/dashboard.php">Mi cuenta</a>
+            <a class="button-secondary" href="/app/select-meals.php">Seleccionar comidas</a>
+            <a class="button-secondary" href="/app/address.php">Mi dirección</a>
         </div>
-
-        <a class="button-secondary" href="/logout.php">Cerrar sesión</a>
     </div>
 
-    <?php if ($sub): ?>
+    <a class="button-secondary" href="/logout.php">Cerrar sesión</a>
+</div>
 
-        <div class="customer-grid">
-            <div class="mini-card">
-                <span class="label">Plan</span>
-                <strong><?= htmlspecialchars($sub['name']) ?></strong>
-            </div>
+<?php if ($sub): ?>
 
-            <div class="mini-card">
-                <span class="label">Comidas</span>
-                <strong><?= (int)$sub['meals_per_week'] ?></strong>
-            </div>
+<!-- PLAN -->
+<div class="customer-grid">
+    <div class="mini-card">
+        <span class="label">Plan</span>
+        <strong><?= $sub['name'] ?></strong>
+    </div>
 
-            <div class="mini-card">
-                <span class="label">Vigencia</span>
-                <strong><?= htmlspecialchars($sub['start_date']) ?> → <?= htmlspecialchars($sub['end_date']) ?></strong>
-            </div>
-        </div>
+    <div class="mini-card">
+        <span class="label">Comidas</span>
+        <strong><?= $sub['meals_per_week'] ?></strong>
+    </div>
 
-        <section style="margin-top: 24px;">
-            <div class="customer-grid">
+    <div class="mini-card">
+        <span class="label">Vigencia</span>
+        <strong><?= $sub['start_date'] ?> → <?= $sub['end_date'] ?></strong>
+    </div>
+</div>
 
-                <div class="mini-card">
-                    <span class="label">Dirección</span>
+<!-- DIRECCIÓN + MENÚ -->
+<section style="margin-top:24px;">
+<div class="customer-grid">
 
-                    <?php if ($address): ?>
-                        <strong>
-                            <?= htmlspecialchars((string)$address['street']) ?>
-                            <?= htmlspecialchars((string)$address['ext_number']) ?>
-                        </strong>
-                        <p class="helper-text">
-                            <?= htmlspecialchars((string)$address['city']) ?>,
-                            <?= htmlspecialchars((string)$address['state']) ?>
-                        </p>
-                    <?php else: ?>
-                        <p class="helper-text">No agregada</p>
-                    <?php endif; ?>
+<div class="mini-card">
+<span class="label">Dirección</span>
 
-                    <a class="button-secondary" href="/app/address.php">Editar</a>
-                </div>
+<?php if ($address): ?>
+<strong><?= $address['street'] ?> <?= $address['ext_number'] ?></strong>
+<p class="helper-text"><?= $address['city'] ?>, <?= $address['state'] ?></p>
+<?php else: ?>
+<p>No agregada</p>
+<?php endif; ?>
 
-                <div class="mini-card">
-                    <span class="label">Menú semanal</span>
+<a class="button-secondary" href="/app/address.php">Editar</a>
+</div>
 
-                    <?php if ($menu): ?>
-                        <strong><?= htmlspecialchars((string)$menu['title']) ?></strong>
+<div class="mini-card">
+<span class="label">Menú semanal</span>
 
-                        <?php if (!empty($menu['selection_deadline'])): ?>
-                            <p class="helper-text">
-                                Selecciona antes de:
-                                <strong><?= htmlspecialchars(date('d/m h:i A', strtotime((string)$menu['selection_deadline']))) ?></strong>
-                            </p>
-                        <?php endif; ?>
-                    <?php else: ?>
-                        <p class="helper-text">No disponible</p>
-                    <?php endif; ?>
-                </div>
+<?php if ($menu): ?>
+<strong><?= $menu['title'] ?></strong>
 
-            </div>
-        </section>
+<?php if (!empty($menu['selection_deadline'])): ?>
+<p class="helper-text">
+Selecciona antes de:
+<strong><?= date('d/m h:i A', strtotime($menu['selection_deadline'])) ?></strong>
+</p>
+<?php endif; ?>
 
-        <section class="week-section">
-            <h2>Tu semana</h2>
+<?php else: ?>
+<p>No disponible</p>
+<?php endif; ?>
 
-            <div class="week-list">
-                <?php foreach ($days as $d): ?>
-                    <div class="card day-card">
-                        <h3 class="day-title"><?= htmlspecialchars($labels[$d]) ?></h3>
+</div>
 
-                        <?php if (!$summary[$d]['items']): ?>
-                            <p class="helper-text">No seleccionaste platillos</p>
-                        <?php else: ?>
-                            <ul>
-                                <?php foreach ($summary[$d]['items'] as $i): ?>
-                                    <li>
-                                        <?= htmlspecialchars((string)$i['name']) ?>
-                                        (<?= htmlspecialchars((string)$i['category']) ?>)
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
+</div>
+</section>
 
-                            <div class="meal-meta">
-                                <span><?= (int)$summary[$d]['calories'] ?> kcal</span>
-                                <span><?= number_format((float)$summary[$d]['protein'], 2) ?>g proteína</span>
-                                <span><?= number_format((float)$summary[$d]['carbs'], 2) ?>g carbs</span>
-                                <span><?= number_format((float)$summary[$d]['fats'], 2) ?>g grasas</span>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </section>
+<!-- 🔥 RESUMEN CORREGIDO -->
+<section class="week-section">
+<h2>Tu semana</h2>
 
-    <?php else: ?>
+<div class="week-list">
 
-        <div class="empty-state">
-            <p>No tienes plan activo</p>
-            <a class="button" href="/app/plans.php">Elegir plan</a>
-        </div>
+<?php foreach ($days as $d): ?>
+<div class="card day-card">
 
-    <?php endif; ?>
+<h3 class="day-title"><?= $labels[$d] ?></h3>
+
+<?php if (!$summary[$d]['items']): ?>
+
+<p class="helper-text">No seleccionaste platillos</p>
+
+<?php else: ?>
+
+<ul>
+<?php foreach ($summary[$d]['items'] as $i): ?>
+<li><?= $i['name'] ?> (<?= $i['category'] ?>)</li>
+<?php endforeach; ?>
+</ul>
+
+<div class="meal-meta">
+<span><?= $summary[$d]['calories'] ?> kcal</span>
+<span><?= $summary[$d]['protein'] ?>g proteína</span>
+<span><?= $summary[$d]['carbs'] ?>g carbs</span>
+<span><?= $summary[$d]['fats'] ?>g grasas</span>
+</div>
+
+<?php endif; ?>
+
+</div>
+<?php endforeach; ?>
+
+</div>
+</section>
+
+<?php else: ?>
+
+<div class="empty-state">
+<p>No tienes plan activo</p>
+<a class="button" href="/app/plans.php">Elegir plan</a>
+</div>
+
+<?php endif; ?>
 
 </section>
 

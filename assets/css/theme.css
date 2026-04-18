@@ -1,25 +1,25 @@
 :root {
-  /* BRAND */
-  --color-primary: #00382E;
-  --color-secondary: #0f6b57;
+  --bg: #061510;
+  --bg-soft: #0b1f19;
+  --card: rgba(255, 255, 255, 0.05);
+  --stroke: rgba(255, 255, 255, 0.08);
 
-  /* UI */
-  --bg-main: #061510;
-  --bg-card: rgba(255,255,255,0.06);
-  --border: rgba(255,255,255,0.1);
+  --text: #edf4f1;
+  --muted: #a5b7b0;
 
-  /* TEXT */
-  --text-main: #edf4f1;
-  --text-muted: #a5b7b0;
+  --accent: #00382e;
+  --accent-2: #0f6b57;
 
-  /* STATES */
   --success: #1f9d68;
   --danger: #c84b4b;
 
-  /* SHADOW */
-  --shadow: 0 20px 60px rgba(0,0,0,.35);
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 
-  /* RADIUS */
-  --radius-lg: 24px;
+  --radius-xl: 24px;
+  --radius-lg: 20px;
   --radius-md: 14px;
+  --radius-sm: 10px;
+
+  --container: 1100px;
+  --container-wide: 1400px;
 }
