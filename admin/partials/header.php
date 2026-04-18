@@ -24,7 +24,7 @@ declare(strict_types=1);
             <a href="/admin/dashboard.php">Dashboard</a>
             <a href="/admin/plans/index.php">Planes</a>
             <a href="/admin/menus/index.php">Menús</a>
-</nav>
+            <a href="/admin/customers/index.php">Clientes</a>
         </nav>
 
         <div class="admin-user-box">
