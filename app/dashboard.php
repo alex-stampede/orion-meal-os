@@ -6,8 +6,9 @@ require __DIR__ . '/partials/auth.php';
 
 $pageTitle = 'Mi cuenta';
 
+/* ===== SUSCRIPCIÓN ACTIVA ===== */
 $stmt = $pdo->prepare("
-    SELECT s.*, mp.name, mp.meals_per_week, mp.duration_weeks
+    SELECT s.*, mp.name, mp.meals_per_week
     FROM subscriptions s
     JOIN meal_plans mp ON mp.id = s.meal_plan_id
     WHERE s.user_id = ? AND s.status = 'active'
@@ -17,51 +18,64 @@ $stmt = $pdo->prepare("
 $stmt->execute([$userId]);
 $sub = $stmt->fetch();
 
-$daysOrder = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
-$dayLabels = [
-    'monday' => 'Lunes',
-    'tuesday' => 'Martes',
-    'wednesday' => 'Miércoles',
-    'thursday' => 'Jueves',
-    'friday' => 'Viernes',
-    'saturday' => 'Sábado',
-    'sunday' => 'Domingo',
+/* ===== DIRECCIÓN ===== */
+$addressStmt = $pdo->prepare("
+    SELECT *
+    FROM customer_addresses
+    WHERE user_id = ? AND is_default = 1
+    ORDER BY id DESC
+    LIMIT 1
+");
+$addressStmt->execute([$userId]);
+$address = $addressStmt->fetch();
+
+/* ===== MENÚ ACTIVO ===== */
+$menuStmt = $pdo->query("
+    SELECT *
+    FROM weekly_menus
+    WHERE status = 'published'
+    ORDER BY week_start DESC
+    LIMIT 1
+");
+$menu = $menuStmt->fetch();
+
+/* ===== RESUMEN POR DÍA ===== */
+$days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+$labels = [
+    'monday'=>'Lunes','tuesday'=>'Martes','wednesday'=>'Miércoles',
+    'thursday'=>'Jueves','friday'=>'Viernes','saturday'=>'Sábado','sunday'=>'Domingo'
 ];
 
-$summaryByDay = [];
-foreach ($daysOrder as $day) {
-    $summaryByDay[$day] = [
-        'items' => [],
-        'calories' => 0,
-        'protein_g' => 0,
-        'carbs_g' => 0,
-        'fats_g' => 0,
+$summary = [];
+
+foreach ($days as $d) {
+    $summary[$d] = [
+        'items'=>[],
+        'calories'=>0,
+        'protein'=>0,
+        'carbs'=>0,
+        'fats'=>0
     ];
 }
 
 if ($sub) {
-    $selStmt = $pdo->prepare("
+    $sel = $pdo->prepare("
         SELECT mi.*
         FROM meal_selections ms
         JOIN menu_items mi ON mi.id = ms.menu_item_id
         WHERE ms.subscription_id = ?
-        ORDER BY FIELD(mi.day_of_week,'monday','tuesday','wednesday','thursday','friday','saturday','sunday'), mi.category, mi.id ASC
     ");
-    $selStmt->execute([(int)$sub['id']]);
-    $selectedItems = $selStmt->fetchAll();
+    $sel->execute([$sub['id']]);
 
-    foreach ($selectedItems as $item) {
-        $day = $item['day_of_week'];
+    foreach ($sel->fetchAll() as $item) {
+        $d = $item['day_of_week'];
 
-        if (!isset($summaryByDay[$day])) {
-            continue;
-        }
+        $summary[$d]['items'][] = $item;
 
-        $summaryByDay[$day]['items'][] = $item;
-        $summaryByDay[$day]['calories'] += (int)($item['calories'] ?? 0);
-        $summaryByDay[$day]['protein_g'] += (float)($item['protein_g'] ?? 0);
-        $summaryByDay[$day]['carbs_g'] += (float)($item['carbs_g'] ?? 0);
-        $summaryByDay[$day]['fats_g'] += (float)($item['fats_g'] ?? 0);
+        $summary[$d]['calories'] += (int)($item['calories'] ?? 0);
+        $summary[$d]['protein'] += (float)($item['protein_g'] ?? 0);
+        $summary[$d]['carbs'] += (float)($item['carbs_g'] ?? 0);
+        $summary[$d]['fats'] += (float)($item['fats_g'] ?? 0);
     }
 }
 
@@ -69,85 +83,121 @@ require __DIR__ . '/partials/header.php';
 ?>
 
 <section class="card page-card">
-    <div class="customer-topbar">
-        <div>
-            <div class="badge">Cliente</div>
-            <h1>Hola, <?= htmlspecialchars($userName) ?></h1>
-            <p class="helper-text">Aquí puedes revisar tu plan y tus comidas seleccionadas.</p>
 
-            <div class="customer-nav">
-                <a class="button-secondary" href="/app/dashboard.php">Mi cuenta</a>
-                <a class="button-secondary" href="/app/plans.php">Planes</a>
-                <a class="button-secondary" href="/app/select-meals.php">Seleccionar comidas</a>
-            </div>
+<div class="customer-topbar">
+    <div>
+        <div class="badge">Cliente</div>
+        <h1>Hola, <?= htmlspecialchars($userName) ?></h1>
+
+        <div class="customer-nav">
+            <a class="button-secondary" href="/app/dashboard.php">Mi cuenta</a>
+            <a class="button-secondary" href="/app/select-meals.php">Seleccionar comidas</a>
+            <a class="button-secondary" href="/app/address.php">Mi dirección</a>
         </div>
-
-        <a class="button-secondary" href="/logout.php">Cerrar sesión</a>
     </div>
 
-    <?php if ($sub): ?>
-        <div class="customer-grid">
-            <div class="mini-card">
-                <span class="label">Plan activo</span>
-                <strong><?= htmlspecialchars($sub['name']) ?></strong>
-            </div>
-            <div class="mini-card">
-                <span class="label">Comidas por semana</span>
-                <strong><?= (int)$sub['meals_per_week'] ?></strong>
-            </div>
-            <div class="mini-card">
-                <span class="label">Vigencia</span>
-                <strong><?= htmlspecialchars($sub['start_date']) ?> a <?= htmlspecialchars($sub['end_date']) ?></strong>
-            </div>
-        </div>
+    <a class="button-secondary" href="/logout.php">Cerrar sesión</a>
+</div>
 
-        <div class="actions-row" style="margin-top:24px;">
-            <a class="button" href="/app/select-meals.php">Seleccionar comidas</a>
-        </div>
+<?php if ($sub): ?>
 
-        <section style="margin-top:32px;">
-            <div class="page-top">
-                <div>
-                    <div class="badge">Resumen semanal</div>
-                    <h2 style="margin:8px 0 0;">Tus platillos por día</h2>
-                </div>
-            </div>
+<!-- PLAN -->
+<div class="customer-grid">
+    <div class="mini-card">
+        <span class="label">Plan</span>
+        <strong><?= $sub['name'] ?></strong>
+    </div>
 
-            <?php foreach ($daysOrder as $day): ?>
-                <?php $dayData = $summaryByDay[$day]; ?>
-                <article class="card meal-card" style="margin-top:18px;">
-                    <h3 style="margin-top:0;"><?= htmlspecialchars($dayLabels[$day]) ?></h3>
+    <div class="mini-card">
+        <span class="label">Comidas</span>
+        <strong><?= $sub['meals_per_week'] ?></strong>
+    </div>
 
-                    <?php if (!$dayData['items']): ?>
-                        <p class="helper-text">No seleccionaste platillos para este día.</p>
-                    <?php else: ?>
-                        <ul style="margin:0 0 16px 18px; padding:0;">
-                            <?php foreach ($dayData['items'] as $item): ?>
-                                <li style="margin-bottom:8px;">
-                                    <strong><?= htmlspecialchars($item['name']) ?></strong>
-                                    <span class="helper-text"> · <?= htmlspecialchars($item['category']) ?></span>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
+    <div class="mini-card">
+        <span class="label">Vigencia</span>
+        <strong><?= $sub['start_date'] ?> → <?= $sub['end_date'] ?></strong>
+    </div>
+</div>
 
-                        <div class="meal-meta">
-                            <span><?= (int)$dayData['calories'] ?> kcal</span>
-                            <span><?= number_format($dayData['protein_g'], 2) ?> g proteína</span>
-                            <span><?= number_format($dayData['carbs_g'], 2) ?> g carbs</span>
-                            <span><?= number_format($dayData['fats_g'], 2) ?> g grasas</span>
-                        </div>
-                    <?php endif; ?>
-                </article>
-            <?php endforeach; ?>
-        </section>
-    <?php else: ?>
-        <div class="empty-state">
-            <p>No tienes un plan activo todavía.</p>
-            <div class="actions-row">
-                <a class="button" href="/app/plans.php">Elegir plan</a>
-            </div>
-        </div>
-    <?php endif; ?>
+<!-- DIRECCIÓN + MENÚ -->
+<section style="margin-top:24px;">
+<div class="customer-grid">
+
+<div class="mini-card">
+<span class="label">Dirección</span>
+
+<?php if ($address): ?>
+<strong><?= $address['street'] ?> <?= $address['ext_number'] ?></strong>
+<p class="helper-text"><?= $address['city'] ?>, <?= $address['state'] ?></p>
+<?php else: ?>
+<p>No agregada</p>
+<?php endif; ?>
+
+<a class="button-secondary" href="/app/address.php">Editar</a>
+</div>
+
+<div class="mini-card">
+<span class="label">Menú semanal</span>
+
+<?php if ($menu): ?>
+<strong><?= $menu['title'] ?></strong>
+
+<?php if ($menu['selection_deadline']): ?>
+<p>
+Selecciona antes de:
+<strong><?= date('d/m h:i A', strtotime($menu['selection_deadline'])) ?></strong>
+</p>
+<?php endif; ?>
+
+<?php else: ?>
+<p>No disponible</p>
+<?php endif; ?>
+
+</div>
+
+</div>
+</section>
+
+<!-- RESUMEN -->
+<section style="margin-top:30px;">
+<h2>Tu semana</h2>
+
+<?php foreach ($days as $d): ?>
+<div class="card" style="margin-top:12px;">
+
+<h3><?= $labels[$d] ?></h3>
+
+<?php if (!$summary[$d]['items']): ?>
+<p>No seleccionaste platillos</p>
+<?php else: ?>
+
+<ul>
+<?php foreach ($summary[$d]['items'] as $i): ?>
+<li><?= $i['name'] ?> (<?= $i['category'] ?>)</li>
+<?php endforeach; ?>
+</ul>
+
+<div class="meal-meta">
+<span><?= $summary[$d]['calories'] ?> kcal</span>
+<span><?= $summary[$d]['protein'] ?>g proteína</span>
+<span><?= $summary[$d]['carbs'] ?>g carbs</span>
+<span><?= $summary[$d]['fats'] ?>g grasas</span>
+</div>
+
+<?php endif; ?>
+
+</div>
+<?php endforeach; ?>
+
+</section>
+
+<?php else: ?>
+
+<p>No tienes plan activo</p>
+<a class="button" href="/app/plans.php">Elegir plan</a>
+
+<?php endif; ?>
+
 </section>
 
 <?php require __DIR__ . '/partials/footer.php'; ?>
