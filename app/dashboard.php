@@ -9,6 +9,11 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+if (($_SESSION['role'] ?? '') !== 'customer') {
+    header('Location: /admin/dashboard.php');
+    exit;
+}
+
 $userId = (int)$_SESSION['user_id'];
 
 $stmt = $pdo->prepare("
@@ -36,21 +41,40 @@ $sub = $stmt->fetch();
 <body>
     <main class="shell">
         <section class="card page-card">
-            <div class="badge">Mi cuenta</div>
-            <h1>Dashboard cliente</h1>
+            <div class="page-top">
+                <div>
+                    <div class="badge">Cliente</div>
+                    <h1>Mi cuenta</h1>
+                    <p>Bienvenido, <?= htmlspecialchars($_SESSION['user_name'] ?? 'Cliente') ?></p>
+                </div>
+                <a class="button-secondary" href="/logout.php">Cerrar sesión</a>
+            </div>
 
             <?php if ($sub): ?>
-                <p>Plan: <strong><?= htmlspecialchars($sub['name']) ?></strong></p>
-                <p>Vigencia: <?= htmlspecialchars($sub['start_date']) ?> a <?= htmlspecialchars($sub['end_date']) ?></p>
+                <div class="grid">
+                    <div class="mini-card">
+                        <span class="label">Plan activo</span>
+                        <strong><?= htmlspecialchars($sub['name']) ?></strong>
+                    </div>
+                    <div class="mini-card">
+                        <span class="label">Inicio</span>
+                        <strong><?= htmlspecialchars($sub['start_date']) ?></strong>
+                    </div>
+                    <div class="mini-card">
+                        <span class="label">Fin</span>
+                        <strong><?= htmlspecialchars($sub['end_date']) ?></strong>
+                    </div>
+                </div>
 
-                <div class="actions-row">
+                <div class="actions-row" style="margin-top: 24px;">
                     <a class="button" href="/app/select-meals.php">Seleccionar comidas</a>
-                    <a class="button-secondary" href="/app/plans.php">Ver otros planes</a>
+                    <a class="button-secondary" href="/app/plans.php">Ver planes</a>
                 </div>
             <?php else: ?>
-                <p>No tienes plan activo.</p>
+                <div class="message-error">No tienes un plan activo todavía.</div>
+
                 <div class="actions-row">
-                    <a class="button" href="/app/plans.php">Ver planes</a>
+                    <a class="button" href="/app/plans.php">Elegir plan</a>
                 </div>
             <?php endif; ?>
         </section>
