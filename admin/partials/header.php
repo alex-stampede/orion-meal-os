@@ -23,6 +23,8 @@ declare(strict_types=1);
         <nav class="admin-nav">
             <a href="/admin/dashboard.php">Dashboard</a>
             <a href="/admin/plans/index.php">Planes</a>
+            <a href="/admin/menus/index.php">Menús</a>
+</nav>
         </nav>
 
         <div class="admin-user-box">
