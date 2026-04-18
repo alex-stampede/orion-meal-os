@@ -85,11 +85,17 @@ $userRole = $_SESSION['role'] ?? 'admin';
             font-weight: 700;
         }
         .grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 16px;
-            margin-top: 24px;
-        }
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
         .mini {
             background: rgba(255,255,255,0.04);
             border: 1px solid var(--stroke);
@@ -123,18 +129,30 @@ $userRole = $_SESSION['role'] ?? 'admin';
                 <a class="logout" href="/logout.php">Cerrar sesión</a>
             </div>
 
-            <div class="grid">
+<div class="grid">
     <div class="mini">
         <span>Rol</span>
         <strong><?= htmlspecialchars($userRole) ?></strong>
     </div>
+
     <div class="mini">
         <span>Módulo</span>
         <strong><a href="/admin/plans/index.php" style="color: white;">Gestión de planes</a></strong>
     </div>
+
     <div class="mini">
-        <span>Estado</span>
-        <strong>Sistema activo</strong>
+        <span>Clientes</span>
+        <strong><a href="/admin/customers/index.php" style="color: white;">Ver clientes</a></strong>
+    </div>
+
+    <div class="mini">
+        <span>Menús</span>
+        <strong><a href="/admin/menus/index.php" style="color: white;">Ver menús</a></strong>
+    </div>
+
+    <div class="mini">
+        <span>Sistema</span>
+        <strong>Activo</strong>
     </div>
 </div>
         </section>
