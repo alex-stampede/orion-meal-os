@@ -15,17 +15,25 @@ declare(strict_types=1);
 <body>
 <div class="admin-shell">
     <aside class="admin-sidebar card">
-        <div class="admin-brand">
-            <div class="badge">Orion Meal OS</div>
-            <h2>Panel</h2>
-        </div>
+<div class="admin-brand">
+    <div class="badge"><?= htmlspecialchars((string)($branding['business_name'] ?? 'Orion Meal OS')) ?></div>
 
-        <nav class="admin-nav">
-            <a href="/admin/dashboard.php">Dashboard</a>
-            <a href="/admin/plans/index.php">Planes</a>
-            <a href="/admin/menus/index.php">Menús</a>
-            <a href="/admin/customers/index.php">Clientes</a>
-        </nav>
+    <?php if (!empty($branding['logo_path'])): ?>
+        <div style="margin:14px 0;">
+            <img src="<?= htmlspecialchars($branding['logo_path']) ?>" alt="Logo" style="max-width:180px; max-height:70px; object-fit:contain;">
+        </div>
+    <?php else: ?>
+        <h2>Panel</h2>
+    <?php endif; ?>
+</div>
+
+<nav class="admin-nav">
+    <a href="/admin/dashboard.php">Dashboard</a>
+    <a href="/admin/plans/index.php">Planes</a>
+    <a href="/admin/menus/index.php">Menús</a>
+    <a href="/admin/customers/index.php">Clientes</a>
+    <a href="/admin/settings/branding.php">Branding</a>
+</nav>
 
         <div class="admin-user-box">
             <span><?= htmlspecialchars($userName) ?></span>
