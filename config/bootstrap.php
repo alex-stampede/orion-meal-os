@@ -29,4 +29,23 @@ function db(array $dbConfig): PDO
     );
 }
 
+function getBranding(PDO $pdo): array
+{
+    try {
+        $stmt = $pdo->query("SELECT * FROM business_settings ORDER BY id ASC LIMIT 1");
+        $branding = $stmt->fetch();
+
+        if ($branding) {
+            return $branding;
+        }
+    } catch (Throwable $e) {
+    }
+
+    return [
+        'business_name' => 'Orion Meal OS',
+        'logo_path' => null,
+    ];
+}
+
 $pdo = db($dbConfig);
+$branding = getBranding($pdo);
