@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_FILES['logo']['name'])) {
         $file = $_FILES['logo'];
 
-        if ($file['error'] === UPLOAD_ERR_OK) {
+        if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
             $tmpName = $file['tmp_name'];
             $originalName = $file['name'];
             $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $error = 'No se pudo subir el archivo.';
                 }
             }
-        } else {
+        } elseif (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
             $error = 'Error al subir el logo.';
         }
     }
@@ -61,7 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             SET business_name = ?, logo_path = ?
             WHERE id = ?
         ");
-        $update->execute([$businessName, $logoPath, $settings['id']'] ?? 1]);
+        $update->execute([
+            $businessName,
+            $logoPath,
+            $settings['id'] ?? 1
+        ]);
 
         header('Location: /admin/settings/branding.php?saved=1');
         exit;
@@ -97,18 +101,32 @@ require __DIR__ . '/../partials/header.php';
     <form method="POST" enctype="multipart/form-data" class="form-grid">
         <div class="form-group full">
             <label>Nombre del negocio</label>
-            <input class="input" type="text" name="business_name" value="<?= htmlspecialchars((string)($settings['business_name'] ?? 'Orion Meal OS')) ?>">
+            <input
+                class="input"
+                type="text"
+                name="business_name"
+                value="<?= htmlspecialchars((string)($settings['business_name'] ?? 'Orion Meal OS')) ?>"
+            >
         </div>
 
         <div class="form-group full">
             <label>Logo</label>
-            <input class="input" type="file" name="logo" accept=".png,.jpg,.jpeg,.webp,.svg">
+            <input
+                class="input"
+                type="file"
+                name="logo"
+                accept=".png,.jpg,.jpeg,.webp,.svg"
+            >
         </div>
 
         <?php if (!empty($settings['logo_path'])): ?>
             <div class="form-group full">
                 <label>Logo actual</label>
-                <img src="<?= htmlspecialchars($settings['logo_path']) ?>" alt="Logo actual" style="max-width:220px; max-height:90px; object-fit:contain; background:rgba(255,255,255,0.04); padding:12px; border-radius:16px; border:1px solid rgba(255,255,255,0.08);">
+                <img
+                    src="<?= htmlspecialchars((string)$settings['logo_path']) ?>"
+                    alt="Logo actual"
+                    style="max-width:220px; max-height:90px; object-fit:contain; background:rgba(255,255,255,0.04); padding:12px; border-radius:16px; border:1px solid rgba(255,255,255,0.08);"
+                >
             </div>
         <?php endif; ?>
 
