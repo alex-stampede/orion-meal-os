@@ -10,13 +10,14 @@ require __DIR__ . '/../partials/header.php';
 ?>
 
 <section class="card page-card">
-    <div class="page-top">
-        <div>
-            <div class="badge">Clientes</div>
-            <h1>Clientes</h1>
-        </div>
-        <a class="button" href="/admin/customers/create.php">Nuevo cliente</a>
+<div class="page-top">
+    <div>
+        <div class="badge">Clientes</div>
+        <h1>Clientes</h1>
+        <p>Administra los clientes registrados y asígnales planes.</p>
     </div>
+    <a class="button" href="/admin/customers/create.php">Nuevo cliente</a>
+</div>
 
     <table class="table">
         <thead>
