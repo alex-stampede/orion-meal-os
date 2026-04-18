@@ -64,7 +64,11 @@ require __DIR__ . '/../partials/header.php';
                         <td><?= htmlspecialchars($menu['title']) ?></td>
                         <td><?= htmlspecialchars($menu['week_start']) ?></td>
                         <td><?= htmlspecialchars($menu['week_end']) ?></td>
-                        <td><span class="status-pill"><?= htmlspecialchars($menu['status']) ?></span></td>
+                        <td>
+    <span class="status-pill">
+        <?= htmlspecialchars(strtoupper((string)$menu['status'])) ?>
+    </span>
+</td>
                         <td><?= $itemsCount ?></td>
                         <td>
                             <div class="actions-row">
