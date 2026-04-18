@@ -265,3 +265,20 @@ h1 {
     padding: 18px;
   }
 }
+.week-section {
+  margin-top: 40px;
+}
+
+.week-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 20px;
+}
+.day-card {
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.02)
+  );
+}
