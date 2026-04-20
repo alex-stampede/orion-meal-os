@@ -33,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($recipientName === '' || $street === '' || $city === '' || $state === '' || $postalCode === '') {
         $error = 'Completa correctamente los campos obligatorios.';
     } else {
-
         if ($address) {
             $update = $pdo->prepare("
                 UPDATE customer_addresses
@@ -109,63 +108,62 @@ require __DIR__ . '/partials/header.php';
     </div>
 
     <?php if ($message): ?>
-        <div class="message-success"><?= $message ?></div>
+        <div class="message-success"><?= htmlspecialchars($message) ?></div>
     <?php endif; ?>
 
     <?php if ($error): ?>
-        <div class="message-error"><?= $error ?></div>
+        <div class="message-error"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
     <form method="POST" class="form-grid">
-
         <div class="form-group full">
             <label>Nombre de quien recibe</label>
-            <input class="input" type="text" name="recipient_name" value="<?= $address['recipient_name'] ?? '' ?>" required>
+            <input class="input" type="text" name="recipient_name" value="<?= htmlspecialchars((string)($address['recipient_name'] ?? '')) ?>" required>
         </div>
 
         <div class="form-group">
             <label>Teléfono</label>
-            <input class="input" type="text" name="phone" value="<?= $address['phone'] ?? '' ?>">
+            <input class="input" type="text" name="phone" value="<?= htmlspecialchars((string)($address['phone'] ?? '')) ?>">
         </div>
 
         <div class="form-group">
             <label>Calle</label>
-            <input class="input" type="text" name="street" value="<?= $address['street'] ?? '' ?>" required>
+            <input class="input" type="text" name="street" value="<?= htmlspecialchars((string)($address['street'] ?? '')) ?>" required>
         </div>
 
         <div class="form-group">
             <label>No. exterior</label>
-            <input class="input" type="text" name="ext_number" value="<?= $address['ext_number'] ?? '' ?>">
+            <input class="input" type="text" name="ext_number" value="<?= htmlspecialchars((string)($address['ext_number'] ?? '')) ?>">
         </div>
 
         <div class="form-group">
             <label>No. interior</label>
-            <input class="input" type="text" name="int_number" value="<?= $address['int_number'] ?? '' ?>">
+            <input class="input" type="text" name="int_number" value="<?= htmlspecialchars((string)($address['int_number'] ?? '')) ?>">
         </div>
 
         <div class="form-group">
             <label>Colonia</label>
-            <input class="input" type="text" name="neighborhood" value="<?= $address['neighborhood'] ?? '' ?>">
+            <input class="input" type="text" name="neighborhood" value="<?= htmlspecialchars((string)($address['neighborhood'] ?? '')) ?>">
         </div>
 
         <div class="form-group">
             <label>Ciudad</label>
-            <input class="input" type="text" name="city" value="<?= $address['city'] ?? '' ?>" required>
+            <input class="input" type="text" name="city" value="<?= htmlspecialchars((string)($address['city'] ?? '')) ?>" required>
         </div>
 
         <div class="form-group">
             <label>Estado</label>
-            <input class="input" type="text" name="state" value="<?= $address['state'] ?? '' ?>" required>
+            <input class="input" type="text" name="state" value="<?= htmlspecialchars((string)($address['state'] ?? '')) ?>" required>
         </div>
 
         <div class="form-group">
             <label>Código postal</label>
-            <input class="input" type="text" name="postal_code" value="<?= $address['postal_code'] ?? '' ?>" required>
+            <input class="input" type="text" name="postal_code" value="<?= htmlspecialchars((string)($address['postal_code'] ?? '')) ?>" required>
         </div>
 
         <div class="form-group full">
             <label>Referencias</label>
-            <textarea class="textarea" name="references_text"><?= $address['references_text'] ?? '' ?></textarea>
+            <textarea class="textarea" name="references_text"><?= htmlspecialchars((string)($address['references_text'] ?? '')) ?></textarea>
         </div>
 
         <div class="actions-row">
