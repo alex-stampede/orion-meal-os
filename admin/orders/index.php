@@ -147,17 +147,20 @@ require __DIR__ . '/../partials/header.php';
             <p class="helper-text">Consulta qué entregar, a quién y a dónde, agrupado por día.</p>
         </div>
     </div>
+<div class="actions-row">
+    <a class="button-secondary" href="/admin/orders/index.php">Todos</a>
+    <a class="button-secondary" href="/admin/orders/index.php?day=monday">Lunes</a>
+    <a class="button-secondary" href="/admin/orders/index.php?day=tuesday">Martes</a>
+    <a class="button-secondary" href="/admin/orders/index.php?day=wednesday">Miércoles</a>
+    <a class="button-secondary" href="/admin/orders/index.php?day=thursday">Jueves</a>
+    <a class="button-secondary" href="/admin/orders/index.php?day=friday">Viernes</a>
+    <a class="button-secondary" href="/admin/orders/index.php?day=saturday">Sábado</a>
+    <a class="button-secondary" href="/admin/orders/index.php?day=sunday">Domingo</a>
 
-    <div class="actions-row">
-        <a class="button-secondary" href="/admin/orders/index.php">Todos</a>
-        <a class="button-secondary" href="/admin/orders/index.php?day=monday">Lunes</a>
-        <a class="button-secondary" href="/admin/orders/index.php?day=tuesday">Martes</a>
-        <a class="button-secondary" href="/admin/orders/index.php?day=wednesday">Miércoles</a>
-        <a class="button-secondary" href="/admin/orders/index.php?day=thursday">Jueves</a>
-        <a class="button-secondary" href="/admin/orders/index.php?day=friday">Viernes</a>
-        <a class="button-secondary" href="/admin/orders/index.php?day=saturday">Sábado</a>
-        <a class="button-secondary" href="/admin/orders/index.php?day=sunday">Domingo</a>
-    </div>
+    <a class="button" href="/admin/orders/export.php<?= $selectedDay !== '' ? '?day=' . urlencode($selectedDay) : '' ?>">
+        Exportar CSV
+    </a>
+</div>
 
     <?php if (!$grouped): ?>
         <div class="empty-state">
