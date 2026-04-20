@@ -2,14 +2,10 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../config/bootstrap.php';
+require __DIR__ . '/partials/auth.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header('Location: /login.php');
-    exit;
-}
+$pageTitle = 'Confirmar plan';
 
-$userId = (int)$_SESSION['user_id'];
 $planId = (int)($_GET['plan_id'] ?? 0);
 
 $stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE id = ? AND status = 'active' LIMIT 1");
@@ -20,7 +16,26 @@ if (!$plan) {
     die('Plan no encontrado');
 }
 
+$activeSubStmt = $pdo->prepare("
+    SELECT id
+    FROM subscriptions
+    WHERE user_id = ? AND status = 'active'
+    ORDER BY id DESC
+    LIMIT 1
+");
+$activeSubStmt->execute([$userId]);
+$activeSubscription = $activeSubStmt->fetch();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($activeSubscription) {
+        $disable = $pdo->prepare("
+            UPDATE subscriptions
+            SET status = 'cancelled'
+            WHERE id = ?
+        ");
+        $disable->execute([(int)$activeSubscription['id']]);
+    }
+
     $start = date('Y-m-d');
     $end = date('Y-m-d', strtotime('+' . (int)$plan['duration_weeks'] . ' weeks'));
 
@@ -47,32 +62,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: /app/dashboard.php');
     exit;
 }
-?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmar plan | Orion Meal OS</title>
-    <link rel="stylesheet" href="/assets/css/theme.css">
-    <link rel="stylesheet" href="/assets/css/base.css">
-    <link rel="stylesheet" href="/assets/css/components.css">
-    <link rel="stylesheet" href="/assets/css/app.css">
-</head>
-<body>
-    <main class="shell">
-        <section class="card page-card" style="max-width: 700px; margin: 40px auto;">
-            <div class="badge">Confirmar plan</div>
-            <h1><?= htmlspecialchars($plan['name']) ?></h1>
-            <p>$<?= number_format((float)$plan['price'], 2) ?></p>
-            <p><?= (int)$plan['meals_per_week'] ?> comidas por semana</p>
-            <p><?= (int)$plan['duration_weeks'] ?> semana(s)</p>
 
-            <form method="POST" class="actions-row">
-                <button class="button" type="submit">Confirmar plan</button>
-                <a class="button-secondary" href="/app/plans.php">Volver</a>
-            </form>
-        </section>
-    </main>
-</body>
-</html>
+require __DIR__ . '/partials/header.php';
+?>
+
+<section class="card page-card" style="max-width: 700px; margin: 40px auto;">
+    <div class="badge">Confirmar plan</div>
+    <h1><?= htmlspecialchars($plan['name']) ?></h1>
+    <p><strong>$<?= number_format((float)$plan['price'], 2) ?></strong></p>
+    <p class="helper-text"><?= htmlspecialchars((string)$plan['description']) ?></p>
+
+    <div class="meal-meta">
+        <span><?= (int)$plan['meals_per_week'] ?> comidas por semana</span>
+        <span><?= (int)$plan['duration_weeks'] ?> semana(s)</span>
+    </div>
+
+    <form method="POST" class="actions-row">
+        <button class="button" type="submit">Confirmar plan</button>
+        <a class="button-secondary" href="/app/plans.php">Volver</a>
+    </form>
+</section>
+
+<?php require __DIR__ . '/partials/footer.php'; ?>
