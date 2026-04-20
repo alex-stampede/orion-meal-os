@@ -17,7 +17,7 @@ declare(strict_types=1);
     <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin:24px 0;">
         <div style="display:flex; align-items:center; gap:14px;">
             <?php if (!empty($branding['logo_path'])): ?>
-                <img src="<?= htmlspecialchars($branding['logo_path']) ?>" alt="Logo" style="max-width:160px; max-height:56px; object-fit:contain;">
+                <img src="<?= htmlspecialchars((string)$branding['logo_path']) ?>" alt="Logo" style="max-width:160px; max-height:56px; object-fit:contain;">
             <?php endif; ?>
             <div class="badge"><?= htmlspecialchars((string)($branding['business_name'] ?? 'Orion Meal OS')) ?></div>
         </div>
