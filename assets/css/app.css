@@ -47,7 +47,7 @@ h1 {
   display: inline-flex;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: #f0f7f4;
   border: 1px solid var(--stroke);
   font-size: 12px;
 }

@@ -8,8 +8,8 @@ body {
   min-height: 100%;
   font-family: "Inter", sans-serif;
   background:
-    radial-gradient(circle at top left, rgba(15, 107, 87, 0.25), transparent 30%),
-    linear-gradient(180deg, #04110d 0%, #081a15 100%);
+    radial-gradient(circle at top left, rgba(93, 177, 150, 0.2), transparent 32%),
+    linear-gradient(180deg, #f2f8f5 0%, #e8f1ed 100%);
   color: var(--text);
 }
 
