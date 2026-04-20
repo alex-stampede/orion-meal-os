@@ -13,7 +13,7 @@
 .mini-card {
   padding: 18px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.04);
+  background: #f7fbf9;
   border: 1px solid var(--stroke);
 }
 
@@ -22,9 +22,9 @@
   align-items: center;
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(15, 107, 87, 0.18);
-  border: 1px solid rgba(125, 255, 207, 0.12);
-  color: #cce9df;
+  background: rgba(18, 107, 89, 0.12);
+  border: 1px solid rgba(18, 107, 89, 0.24);
+  color: var(--accent);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -100,8 +100,8 @@
 }
 
 .button-secondary {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  background: #f4f8f6;
+  color: var(--text);
   border-color: var(--stroke);
 }
 
@@ -141,7 +141,7 @@
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.08);
+  background: #eef5f2;
 }
 
 .form-grid {
@@ -167,7 +167,7 @@
   padding: 14px 16px;
   border-radius: var(--radius-md);
   border: 1px solid var(--stroke);
-  background: rgba(255, 255, 255, 0.04);
+  background: #fdfefe;
   color: var(--text);
   outline: none;
 }
@@ -232,7 +232,7 @@
 .admin-nav a {
   text-decoration: none;
   color: var(--text);
-  background: rgba(255, 255, 255, 0.04);
+  background: #f6fbf8;
   border: 1px solid var(--stroke);
   padding: 12px 14px;
   border-radius: var(--radius-md);
@@ -254,7 +254,7 @@
   padding: 22px;
   border-radius: 18px;
   border: 1px dashed var(--stroke);
-  background: rgba(255, 255, 255, 0.03);
+  background: #f7fbf9;
   margin-top: 18px;
 }
 
