@@ -36,7 +36,7 @@ $selectedItemIds = [];
 
 if ($menu) {
     $countStmt = $pdo->prepare("
-        SELECT COUNT(*) 
+        SELECT COUNT(*)
         FROM meal_selections
         WHERE subscription_id = ?
     ");
@@ -56,36 +56,41 @@ $message = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $menu) {
-    $menuItemId = (int)($_POST['menu_item_id'] ?? 0);
-
-    if ($selectedCount >= (int)$subscription['meals_per_week']) {
-        $error = 'Ya alcanzaste el límite de comidas de tu plan.';
-    } elseif (in_array($menuItemId, $selectedItemIds, true)) {
-        $error = 'Ese platillo ya fue seleccionado.';
+    if (!empty($menu['selection_deadline']) && strtotime((string)$menu['selection_deadline']) < time()) {
+        $error = 'La fecha límite para seleccionar comidas ya venció.';
     } else {
-        $itemStmt = $pdo->prepare("
-            SELECT * FROM menu_items
-            WHERE id = ? AND weekly_menu_id = ? AND status = 'active'
-            LIMIT 1
-        ");
-        $itemStmt->execute([$menuItemId, (int)$menu['id']]);
-        $item = $itemStmt->fetch();
+        $menuItemId = (int)($_POST['menu_item_id'] ?? 0);
 
-        if ($item) {
-            $insert = $pdo->prepare("
-                INSERT INTO meal_selections (subscription_id, menu_item_id, delivery_date)
-                VALUES (?, ?, ?)
-            ");
-            $insert->execute([
-                (int)$subscription['id'],
-                $menuItemId,
-                date('Y-m-d')
-            ]);
-
-            header('Location: /app/select-meals.php?selected=1');
-            exit;
+        if ($selectedCount >= (int)$subscription['meals_per_week']) {
+            $error = 'Ya alcanzaste el límite de comidas de tu plan.';
+        } elseif (in_array($menuItemId, $selectedItemIds, true)) {
+            $error = 'Ese platillo ya fue seleccionado.';
         } else {
-            $error = 'No se encontró el platillo seleccionado.';
+            $itemStmt = $pdo->prepare("
+                SELECT *
+                FROM menu_items
+                WHERE id = ? AND weekly_menu_id = ? AND status = 'active'
+                LIMIT 1
+            ");
+            $itemStmt->execute([$menuItemId, (int)$menu['id']]);
+            $item = $itemStmt->fetch();
+
+            if ($item) {
+                $insert = $pdo->prepare("
+                    INSERT INTO meal_selections (subscription_id, menu_item_id, delivery_date)
+                    VALUES (?, ?, ?)
+                ");
+                $insert->execute([
+                    (int)$subscription['id'],
+                    $menuItemId,
+                    date('Y-m-d')
+                ]);
+
+                header('Location: /app/select-meals.php?selected=1');
+                exit;
+            } else {
+                $error = 'No se encontró el platillo seleccionado.';
+            }
         }
     }
 }
@@ -138,6 +143,7 @@ require __DIR__ . '/partials/header.php';
                 <a class="button-secondary" href="/app/dashboard.php">Mi cuenta</a>
                 <a class="button-secondary" href="/app/plans.php">Planes</a>
                 <a class="button-secondary" href="/app/select-meals.php">Seleccionar comidas</a>
+                <a class="button-secondary" href="/app/address.php">Mi dirección</a>
             </div>
         </div>
 
@@ -163,6 +169,11 @@ require __DIR__ . '/partials/header.php';
             <p class="helper-text">
                 Semana: <?= htmlspecialchars($menu['week_start']) ?> a <?= htmlspecialchars($menu['week_end']) ?>
             </p>
+            <?php if (!empty($menu['selection_deadline'])): ?>
+                <p class="helper-text">
+                    Fecha límite: <strong><?= htmlspecialchars(date('d/m/Y h:i A', strtotime((string)$menu['selection_deadline']))) ?></strong>
+                </p>
+            <?php endif; ?>
         </div>
 
         <?php if (!$itemsByDay): ?>
@@ -171,7 +182,7 @@ require __DIR__ . '/partials/header.php';
             </div>
         <?php else: ?>
             <?php foreach ($itemsByDay as $day => $dayItems): ?>
-                <section class="day-section">
+                <section class="week-section">
                     <h2 class="day-title"><?= htmlspecialchars($dayLabels[$day] ?? $day) ?></h2>
 
                     <div class="meals-grid">
@@ -208,6 +219,8 @@ require __DIR__ . '/partials/header.php';
                                         <span class="button-secondary" style="pointer-events:none; opacity:.7;">Ya seleccionado</span>
                                     <?php elseif ($selectedCount >= (int)$subscription['meals_per_week']): ?>
                                         <span class="button-secondary" style="pointer-events:none; opacity:.7;">Límite alcanzado</span>
+                                    <?php elseif (!empty($menu['selection_deadline']) && strtotime((string)$menu['selection_deadline']) < time()): ?>
+                                        <span class="button-secondary" style="pointer-events:none; opacity:.7;">Fuera de tiempo</span>
                                     <?php else: ?>
                                         <form method="POST">
                                             <input type="hidden" name="menu_item_id" value="<?= (int)$item['id'] ?>">
