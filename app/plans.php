@@ -6,10 +6,10 @@ require __DIR__ . '/../config/bootstrap.php';
 
 $pageTitle = 'Planes';
 
+$isCustomer = isset($_SESSION['role']) && $_SESSION['role'] === 'customer';
+
 $stmt = $pdo->query("SELECT * FROM meal_plans WHERE status = 'active' ORDER BY id DESC");
 $plans = $stmt->fetchAll();
-
-$isCustomer = isset($_SESSION['role']) && $_SESSION['role'] === 'customer';
 
 require __DIR__ . '/partials/header.php';
 ?>
@@ -26,6 +26,7 @@ require __DIR__ . '/partials/header.php';
                     <a class="button-secondary" href="/app/dashboard.php">Mi cuenta</a>
                     <a class="button-secondary" href="/app/plans.php">Planes</a>
                     <a class="button-secondary" href="/app/select-meals.php">Seleccionar comidas</a>
+                    <a class="button-secondary" href="/app/address.php">Mi dirección</a>
                 </div>
             <?php endif; ?>
         </div>
