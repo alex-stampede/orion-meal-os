@@ -32,6 +32,7 @@ declare(strict_types=1);
     <a href="/admin/plans/index.php">Planes</a>
     <a href="/admin/menus/index.php">Menús</a>
     <a href="/admin/customers/index.php">Clientes</a>
+    <a href="/admin/orders/index.php">Pedidos</a>
     <a href="/admin/settings/branding.php">Branding</a>
 </nav>
 
